@@ -1,0 +1,82 @@
+.form--contact {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #2d5356;
+    padding: 20px;
+    border-radius: 12px;
+    width: 470px;
+    height: 670px;
+    margin-top: 70px;
+}
+
+.form-group {
+    display: flex;
+    align-items: center;
+    color: white;
+    gap: 10px;
+    margin-top: 10px;
+    
+}
+
+.form-group input {
+    width: 370px;  
+    height: 55px; 
+    padding: 10px 20px;
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    background-color: #1d767c;
+    border: none;
+    outline: none;
+    color: white;
+}
+
+.form-group textarea {
+    width: 370px;
+    height: 200px;
+    padding: 10px 30px;
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    background-color: #1d767c;
+    border: none;
+    outline: none;
+    color: white;
+}
+
+.form-group input::placeholder, textarea::placeholder {
+    color: white;
+}
+
+.button-input {
+    padding: 10px 20px;
+    width: 370px;
+    border: none;
+    border-radius: 12px;
+    background-color: #da9c1d;
+    color: white;
+    cursor: pointer;
+    outline: none;
+    margin-top: 30px;
+}
+
+
+@media screen and (max-width: 500px) {
+    .form--contact {
+        width: 90%;
+        height: 550px;
+    }
+    .form-group input {
+        width: 100%;
+        height: 40px;
+    }
+    .form-group textarea {
+        width: 100%;
+        
+    }
+    .button-input {
+        width: 80%;
+    }
+}
