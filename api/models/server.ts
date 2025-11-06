@@ -3,6 +3,7 @@ import cors from 'cors';
 import { dbConnection } from '../database/config';
 import authRoutes from '../routes/auth';
 import orderRoutes from '../routes/orders';
+import productRoutes from '../routes/product';
 
 //Creamos el servidor
 
@@ -48,7 +49,7 @@ export class Server {
     routes(): void {
         this.app.use(this.authPath, authRoutes)
         this.app.use(this.orderPath, orderRoutes)
-        // this.app.use(this.productPath, productRoutes)
+        this.app.use(this.productPath, productRoutes)
     }
  
 

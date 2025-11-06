@@ -1,10 +1,9 @@
-import { Box, Text, Grid, GridItem, Heading, Button, Img, Select, useToast } from '@chakra-ui/react';
-import { products as productsData } from '../../Data/Products';
+import { Box, Text, Grid, GridItem, Heading, Button, Img, Select, useToast, Spinner, Center, Alert, AlertIcon } from '@chakra-ui/react';
+import { fetchProducts } from '../../redux/ProductSlice/productSlice';
 import React, { useEffect, useState } from 'react';
 import Categories from '../../Components/Categories/Categories';
 import { useDispatch, useSelector } from 'react-redux';
 import { addItemToCart } from '../../redux/CartSlice/cartSlice';
-import { setProducts } from '../../redux/ProductSlice/productSlice';
 import { FaCartShopping } from "react-icons/fa6";
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -14,19 +13,20 @@ export const Products = () => {
   const [productsToShow, setProductsToShow] = useState(6); // Número inicial de productos a mostrar
   const selectedCategory = useSelector((state) => state.category.selectedCategory);
   const products = useSelector((state) => state.products.products);
+  const productsStatus = useSelector((state) => state.products.status);
+  const productsError = useSelector((state) => state.products.error);
   const dispatch = useDispatch();
   const toast = useToast();
   const MotionGridItem = motion(GridItem);
   const MotionGrid = motion(Grid);
 
   useEffect(() => {
-    // Despacha la acción para establecer los productos en el estado de Redux
-    dispatch(setProducts(productsData));
+    // Fetch products from backend via thunk
+    dispatch(fetchProducts());
   }, [dispatch]);
-
   useEffect(() => {
     // Filtra los productos según la categoría seleccionada
-    let filteredProducts = [...products]; ;
+    let filteredProducts = [...products];
     if (selectedCategory && selectedCategory !== 'Todo') {
       filteredProducts = products.filter(product => product.categoria === selectedCategory);
     }
@@ -42,6 +42,25 @@ export const Products = () => {
     }
     setVisibleProducts(filteredProducts.slice(0, productsToShow)); // Mostrar solo los productos necesarios
   }, [products, selectedCategory, filter, productsToShow]);
+
+  if (productsStatus === 'loading') {
+    return (
+      <Center mt="120px">
+        <Spinner size="xl" />
+      </Center>
+    );
+  }
+
+  if (productsStatus === 'failed') {
+    return (
+      <Center mt="120px">
+        <Alert status="error" maxW="800px">
+          <AlertIcon />
+          {productsError || 'Error al cargar productos'}
+        </Alert>
+      </Center>
+    );
+  }
 
   const handleFilterChange = (event) => {
     setFilter(event.target.value);
