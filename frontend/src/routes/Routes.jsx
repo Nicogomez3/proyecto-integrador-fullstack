@@ -12,6 +12,7 @@ import ProtectedRoute from '../Components/ProtectedRoute/ProtectedRoute'
 import Order from '../Pages/Order/Order'
 import Congratulations from '../Pages/Congratulations/Congratulations'
 import NotFound from '../Pages/NotFound/NotFound'
+import Verify from '../Pages/Verify/Verify'
 
 
 
@@ -45,6 +46,8 @@ function Routes()  {
                  <Route path="/order" element={<Order />} /> 
                 {/* Congrats  */}
                 <Route path="/congratulations" element={<Congratulations />} />
+                {/* Verify */}
+                <Route path="/verify" element={<Verify />} />
             </ReactDomRoutes>
         </Layout>
     </BrowserRouter>

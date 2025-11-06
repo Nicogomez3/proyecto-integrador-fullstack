@@ -3,7 +3,8 @@ import { Formik, Form } from 'formik';
 import { Box, Button, Container, Heading, Text } from '@chakra-ui/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { loginUser, clearError } from '../../redux/AuthSlice/authSlice';
+import { loginUser, clearError, loginUserThunk } from '../../redux/AuthSlice/authSlice';
+import { unwrapResult } from '@reduxjs/toolkit';
 import InputLogin from '../../UI/InputLogin/InputLogin';
 import { loginInitialValues } from '../../Formik/initialValues';
 import { loginValidationSchema } from '../../Formik/validationSchema';
@@ -19,8 +20,19 @@ const Login = () => {
 
   const handleSubmit = (values, { setSubmitting, setErrors }) => {
     console.log('Valores enviados al iniciar sesión:', values);
-    dispatch(loginUser(values));
-    setSubmitting(false);
+    (async () => {
+      try {
+        const actionResult = await dispatch(loginUserThunk(values));
+        unwrapResult(actionResult);
+        // navegación será manejada por el useEffect que escucha loggedInUser
+      } catch (err) {
+        // err viene de rejectWithValue
+        const message = err || 'Error al iniciar sesión';
+        setErrors({ email: message, password: message });
+      } finally {
+        setSubmitting(false);
+      }
+    })();
   };
 
   useEffect(() => {

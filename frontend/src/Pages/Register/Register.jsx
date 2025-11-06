@@ -7,7 +7,9 @@ import InputLogin from '../../UI/InputLogin/InputLogin'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import {  registerUser } from '../../redux/AuthSlice/authSlice'
+import { unwrapResult } from '@reduxjs/toolkit';
 import useRedirect from '../../Hooks/useRedirect'
+import { registerUserThunk } from "../../redux/AuthSlice/authSlice";
 
 const Register = () => {
     const { state } = useLocation()
@@ -17,25 +19,23 @@ const Register = () => {
     // useRedirect(state?.registerFromCheckout ? '/checkout' : '/login');
     const redirectTo = state?.redirectFromCheckout ? '/checkout' : '/login';
 
+        const handleRegister = async (values) => {
+            try {
+                const actionResult = await dispatch(registerUserThunk(values));
+                // Lanza si la acción fue rechazada y devuelve el payload si fue exitosa
+                unwrapResult(actionResult);
+                navigate('/verify');
+            } catch (err) {
+                console.error('Error en el registro:', err);
+            }
+        };
     
-
     // const handleRegister = async (values) => {
-    //     // Ejecuta el dispatch y asegura que se complete antes de redirigir
-    //     await dispatch(registerUser(values)); 
-    //     console.log("Usuario registrado:", values); // Confirmar datos registrados
-    //     if (redirectTo) {
-    //       navigate(redirectTo); // Redirige si `redirectTo` tiene un valor
-    //     } else {
-    //       navigate('/login'); // Si no hay `redirectTo`, envía al inicio
-    //     }
+    //     await dispatch(registerUser(values)); // Registra al usuario
+    //     console.log("Usuario registrado:", values); // Registro para depuración
+    //     console.log("Usuario registrado:", values);
+    //     navigate(redirectTo); // Redirige al destino configurado
     //   };
-
-    const handleRegister = async (values) => {
-        await dispatch(registerUser(values)); // Registra al usuario
-        console.log("Usuario registrado:", values); // Registro para depuración
-        console.log("Usuario registrado:", values);
-        navigate(redirectTo); // Redirige al destino configurado
-      };
 
 
   return (

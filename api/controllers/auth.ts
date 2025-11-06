@@ -9,7 +9,10 @@ import  generarJWT  from '../helpers/generarJWT';
 export const register = async (req: Request, res: Response): Promise<void> => {
     const { nombre, email, password, rol} = req.body;
 
-    const usuario = new Usuario({ nombre, email, password, rol });
+    // Normalizar email para evitar duplicados por mayúsculas/espacios
+    const emailNormalized = String(email).trim().toLowerCase();
+
+    const usuario = new Usuario({ nombre, email: emailNormalized, password, rol });
 
     //Encriptar la contraseña
     const salt = bcryptjs.genSaltSync();
@@ -31,8 +34,8 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     await usuario.save();
 
-    // Enviar email de verificación
-    await sendEmail(email, newCode);
+    // Enviar email de verificación (usar el email normalizado)
+    await sendEmail(emailNormalized, newCode);
 
     res.status(201).json({
         usuario
@@ -42,8 +45,10 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 export const login = async (req: Request, res: Response): Promise<void> => {
     const { email, password } :IUsuario = req.body;
 
+    const emailNormalized = String(email).trim().toLowerCase();
+
     try {
-        const usuario = await Usuario.findOne({ email });
+    const usuario = await Usuario.findOne({ email: emailNormalized });
 
         if(!usuario) {
             res.status(400).json({
@@ -61,7 +66,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        const token = await generarJWT( usuario.id );
+    const token = await generarJWT( usuario.id );
 
         res.json({
             usuario,
@@ -77,8 +82,10 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 export const verifyUser = async (req: Request, res: Response): Promise<void> => {
     const { email, code } : IUsuario = req.body;
 
+    const emailNormalized = String(email).trim().toLowerCase();
+
     try {
-        const usuario = await Usuario.findOne({ email });
+    const usuario = await Usuario.findOne({ email: emailNormalized });
 
         if (!usuario) {
             res.status(400).json({
@@ -101,9 +108,16 @@ export const verifyUser = async (req: Request, res: Response): Promise<void> => 
             return;
         }
 
-        const usuarioActualizado = await Usuario.findByIdAndUpdate( { email }, { verified: true } )
+        // Marcamos al usuario como verificado y limpiamos el código
+        const usuarioActualizado = await Usuario.findOneAndUpdate(
+            { email: emailNormalized },
+            { verified: true, code: null },
+            { new: true }
+        );
+
         res.status(200).json({
             message: 'Usuario verificado correctamente',
+            user: usuarioActualizado
         })
     } catch (error) {
         res.status(400).json({

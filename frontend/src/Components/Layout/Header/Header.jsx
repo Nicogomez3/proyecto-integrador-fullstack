@@ -6,6 +6,8 @@ import { Link } from 'react-router-dom'
 import { toggleMenu } from '../../../redux/MenuSlice/menuSlice';
 import Cart from '../../Cart/Cart';
 import { logoutUser } from '../../../redux/AuthSlice/authSlice';
+import { persistor } from '../../../redux/store';
+import { clearCart } from '../../../redux/CartSlice/cartSlice';
 // import { FaRegUser } from "react-icons/fa";
 // import { PiSignIn } from "react-icons/pi";
 import { motion, AnimatePresence } from 'framer-motion';
@@ -22,7 +24,12 @@ export const Header = () => {
 
 
     const handleLogout = () => {
+      
+      dispatch(clearCart());
+      
       dispatch(logoutUser());
+     
+      persistor.purge();
     };
 
     const handleClick = () => {
@@ -92,7 +99,8 @@ export const Header = () => {
                     transition={{ duration: 0.3 }}
                     exit={{ opacity: 0, y: -10 }}
                     
-                    display={{ base: isMenuOpen ? "flex" : "none", md: "flex" }}
+                    // Mostrar este menú solo en mobile; en md+ usamos el container de navegación
+                    display={{ base: isMenuOpen ? "flex" : "none", md: "none" }}
                     flexDirection={{ base: "column", md: "row" }}
                     color='white'  
                     gap="4" 
@@ -117,18 +125,18 @@ export const Header = () => {
                     <NavLinkHover to="/Products" onClick={handleClick}>Productos</NavLinkHover>
 
                     {loggedInUser ? (
-                      <Container
-                        display="flex"
-                        padding="0"
-                        flexDirection={{ base: "column", md:"row" }}
-                        alignItems={{ base: "flex-end", md:"center" }}
-                        gap="10px"
-                      >
-                        <Text color="white">{loggedInUser.name}</Text>
-                        <Button bg="#da9c1d" color="white" onClick={handleLogout}>
-                          Cerrar Sesión
-                        </Button>
-                      </Container>
+                          <Container
+                            display="flex"
+                            padding="0"
+                            flexDirection={{ base: "column", md:"row" }}
+                            alignItems={{ base: "flex-end", md:"center" }}
+                            gap="10px"
+                          >
+                            <Text color="white">{loggedInUser?.name || loggedInUser?.nombre || (loggedInUser?.email && loggedInUser.email.split('@')[0]) || 'Usuario'}</Text>
+                            <Button bg="#da9c1d" color="white" onClick={handleLogout}>
+                              Cerrar Sesión
+                            </Button>
+                          </Container>
                     ) : (
                       <>
                         <Button
@@ -176,12 +184,12 @@ export const Header = () => {
               <NavLinkHover to="/Products" onClick={handleClick}>Productos</NavLinkHover>
 
               {loggedInUser ? (
-                <Container display="flex" padding="0" flexDirection="row" alignItems="center" gap="10px">
-                  <Text color="white">{loggedInUser.name}</Text>
-                  <Button bg="#da9c1d" color="white" onClick={handleLogout}>
-                    Cerrar Sesión
-                  </Button>
-                </Container>
+                  <Container display="flex" padding="0" flexDirection="row" alignItems="center" gap="10px">
+                    <Text color="white">{loggedInUser?.name || loggedInUser?.nombre || (loggedInUser?.email && loggedInUser.email.split('@')[0]) || 'Usuario'}</Text>
+                    <Button bg="#da9c1d" color="white" onClick={handleLogout}>
+                      Cerrar Sesión
+                    </Button>
+                  </Container>
               ) : (
                 <>
                 

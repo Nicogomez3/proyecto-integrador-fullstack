@@ -4,9 +4,10 @@ import { FormControl, FormLabel, Input, Button, Container, Box } from '@chakra-u
 import { initialValues } from '../../../Formik/initialValues';
 import { validationSchema } from '../../../Formik/validationSchema';
 import { Input as InputForm } from '../../../UI/Input/Input';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { createOrder } from '../../../redux/OrderSlice/orderSlice';
+import { createOrderThunk } from '../../../redux/OrderSlice/orderSlice';
 
 const CheckoutForm = () => {
   const dispatch = useDispatch();
@@ -22,6 +23,7 @@ const CheckoutForm = () => {
     console.log("Submit ejecutado");
     if (!cartItems || cartItems.length === 0) {
       console.error('No hay artículos en el carrito');
+      alert('No hay artículos en el carrito');
       return;
     }
 
@@ -31,24 +33,68 @@ const CheckoutForm = () => {
 
     console.log("Valores del formulario:", values); // Depuración
 
-    const order = {
-      id: new Date().getTime(),
-      date: new Date().toLocaleString(),
-      items: cartItems,
-      totalPrice: cartItems.reduce((total, item) => total + item.precio * item.quantity, 0),
-      buyer: {
+    // Mapear items a la forma que espera el backend y asegurar campos obligatorios
+    const itemsForBackend = cartItems.map((it) => {
+      const title = it.title || it.nombre || it.name || it.titulo || it.description || '';
+      const desc = it.desc || it.description || title || 'Sin descripción';
+      const price = Number(it.precio ?? it.price ?? it.unitPrice ?? 0);
+      const quantity = Number(it.quantity ?? it.cantidad ?? 1);
+
+      return {
+        desc,
+        id: it.id || it.productId || it._id || 0,
+        price,
+        quantity,
+        title,
+      };
+    });
+
+    // Validaciones simples en frontend antes de enviar
+    if (!values.name || !values.lastName || !values.email || !values.phone || !values.address) {
+      alert('Completa los datos de envío: nombre, apellido, email, teléfono y dirección');
+      return;
+    }
+
+    // Asegurar que no hay items con campos inválidos
+    const invalidItem = itemsForBackend.find(i => !i.desc || !i.title || !i.price || !i.quantity);
+    if (invalidItem) {
+      alert('Hay un artículo en el carrito con datos incompletos. Revisa el carrito antes de confirmar.');
+      return;
+    }
+
+    const price = itemsForBackend.reduce((total, i) => total + i.price * i.quantity, 0);
+    const total = price; // ajustar si hay impuestos/envío
+
+    const orderData = {
+      price,
+      total,
+      items: itemsForBackend,
+      shippingDetails: {
         name: values.name,
         lastName: values.lastName,
         email: values.email,
-        phone: values.phone,
-        province: values.province,
-        city: values.city,
+        cellphone: String(values.phone || '').trim(),
+        location: `${values.province || ''} - ${values.city || ''}`,
         address: values.address,
       },
     };
-    
-    dispatch(createOrder(order));
-    navigate('/congratulations');
+
+    (async () => {
+      try {
+        const actionResult = await dispatch(createOrderThunk(orderData));
+        unwrapResult(actionResult);
+        navigate('/congratulations');
+      } catch (err) {
+        console.error('Error creando orden:', err);
+        // err puede ser un objeto con message y details (desde rejectWithValue)
+        const message = err?.message || err || 'Error al crear la orden';
+        if (err?.details && Array.isArray(err.details)) {
+          alert(`${message}:\n- ${err.details.join('\n- ')}`);
+        } else {
+          alert(message);
+        }
+      }
+    })();
   }
   
   return (
