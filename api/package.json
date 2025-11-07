@@ -28,7 +28,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist/app.js",
     "build": "tsc && npm run copy-data",
-    "copy-data": "if not exist dist\\data mkdir dist\\data && copy src\\data\\*.json dist\\data\\"
+    "copy-data": "mkdir -p dist/data && cp -r src/data/*.json dist/data/"
 
   },
   "keywords": [],
