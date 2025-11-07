@@ -10,7 +10,7 @@ import cartRoutes from '../routes/cart';
 
 export class Server {
     app: Express;
-    port: string | number | undefined;
+    port: number;
     authPath: string;
     orderPath: string;
     productPath: string
@@ -18,7 +18,7 @@ export class Server {
 // Configuramos el constructor
     constructor() {
         this.app = express();
-        this.port = process.env.PORT || 8080;
+        this.port = Number(process.env.PORT) || 8080;
         this.authPath = '/auth';
         this.orderPath = '/orders';
         this.productPath = '/products';
@@ -60,8 +60,11 @@ export class Server {
 
     //Metodo para escuchar el servidor
     listen(): void {
-        this.app.listen(this.port, () => {
-            console.log(`Servidor corriendo en el puerto ${this.port}`);
+
+        const port = this.port;
+
+        this.app.listen(port, () => {
+            console.log(`Servidor corriendo en el puerto ${port}`);
         })
     }
 }
