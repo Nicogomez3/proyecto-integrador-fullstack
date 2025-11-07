@@ -1,10 +1,10 @@
 import axios from "axios";
 
 const API_URL =
-  import.meta.env.MODE === "development"
+  import.meta.env.VITE_API_URL + "/auth"
     // El backend expone las rutas en /auth y por defecto corre en el puerto 8080
     ? "http://localhost:8080/auth"
-    : "https://tu-proyecto-integrador.vercel.app/api/auth";
+    : "https://proyecto-integrador-fullstack.onrender.com/auth";
 
 export const registerUserAPI = async (userData) => {
   // El backend espera { nombre, email, password }

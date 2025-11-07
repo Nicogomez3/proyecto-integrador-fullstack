@@ -19,24 +19,22 @@ const Register = () => {
     // useRedirect(state?.registerFromCheckout ? '/checkout' : '/login');
     const redirectTo = state?.redirectFromCheckout ? '/checkout' : '/login';
 
-        const handleRegister = async (values) => {
-            try {
-                const actionResult = await dispatch(registerUserThunk(values));
-                // Lanza si la acción fue rechazada y devuelve el payload si fue exitosa
-                unwrapResult(actionResult);
-                navigate('/verify');
-            } catch (err) {
-                console.error('Error en el registro:', err);
-            }
-        };
+    const handleRegister = async (values) => {
+        const backendData = {
+            name: values.name,
+            email: values.email,
+            password: values.password,
+        }
+        try {
+            const actionResult = await dispatch(registerUserThunk(backendData));
+            // Lanza si la acción fue rechazada y devuelve el payload si fue exitosa
+            unwrapResult(actionResult);
+            navigate('/verify');
+        } catch (err) {
+            console.error('Error en el registro:', err);
+        }
+    };
     
-    // const handleRegister = async (values) => {
-    //     await dispatch(registerUser(values)); // Registra al usuario
-    //     console.log("Usuario registrado:", values); // Registro para depuración
-    //     console.log("Usuario registrado:", values);
-    //     navigate(redirectTo); // Redirige al destino configurado
-    //   };
-
 
   return (
     <Container as="section" width="100%" height="100vh" display="flex" flexDirection="column" alignItems="center" justifyContent="center">
