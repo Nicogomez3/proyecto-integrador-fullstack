@@ -4,6 +4,7 @@ import { dbConnection } from '../database/config';
 import authRoutes from '../routes/auth';
 import orderRoutes from '../routes/orders';
 import productRoutes from '../routes/product';
+import cartRoutes from '../routes/cart';
 
 //Creamos el servidor
 
@@ -50,6 +51,7 @@ export class Server {
         this.app.use(this.authPath, authRoutes)
         this.app.use(this.orderPath, orderRoutes)
         this.app.use(this.productPath, productRoutes)
+        this.app.use('/cart', cartRoutes)
     }
  
 

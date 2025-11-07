@@ -2,7 +2,7 @@ import { Box, Button, Container, Drawer, DrawerBody, DrawerCloseButton, DrawerCo
 import React, { useState } from 'react'
 import { AiOutlineShopping } from "react-icons/ai";
 import { useDispatch, useSelector } from 'react-redux';
-import { clearCart, decrementItemQuantity, incrementItemQuantity, toggleCart } from '../../redux/CartSlice/cartSlice';
+import { clearCart, decrementItemQuantityLocal, incrementItemQuantityLocal, toggleCart } from '../../redux/CartSlice/cartSlice';
 import { Navigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 const Cart = () => {
@@ -11,6 +11,7 @@ const Cart = () => {
   const isOpen = useSelector((state) => state.cart.isOpen)
   const items = useSelector((state) => state.cart.items) || [];
   const totalItems = items.reduce((total, item) => total + item.quantity, 0);
+  
   const { isOpen: isModalOpen, onOpen: onModalOpen, onClose: onModalClose} = useDisclosure();
   const { isOpen: isDeleteModalOpen, onOpen: onDeleteModalOpen, onClose: onDeleteModalClose} = useDisclosure();
   const [itemToDelete, setItemToDelete] = useState(null);
@@ -25,14 +26,14 @@ const Cart = () => {
     if(item.quantity === 1) {
       setItemToDelete(item);
       onDeleteModalOpen();
-    } else {
-      dispatch(decrementItemQuantity(item.id));
+      } else {
+      dispatch(decrementItemQuantityLocal(item.id));
     }
   };
 
   const handleDeleteItem = () => {
     if (itemToDelete) {
-      dispatch(decrementItemQuantity(itemToDelete.id));
+      dispatch(decrementItemQuantityLocal(itemToDelete.id));
       onDeleteModalClose();
     }
   };
@@ -57,12 +58,12 @@ const Cart = () => {
                   ) : (
                     items.map((item) => (
                     <Box key={item.id} display="flex" justifyContent="space-between" alignItems="center" mb="10px" gap="10px">
-                      <Text> {item.nombre} </Text>
-                      <Img src={item.img} alt={item.nombre} width="50px" height="50px" />
+                      <Text> {item.nombre || item.title || item.name} </Text>
+                      <Img src={item.img || item.image || item.picture} alt={item.nombre || item.title || item.name} width="50px" height="50px" />
                       <Box display="flex" alignItems="center">
                         <Button onClick={() => handleDecrement(item)}>-</Button>
                         <Text mx="10px"> {item.quantity} </Text>
-                        <Button onClick={() => dispatch(incrementItemQuantity(item.id))}>+</Button>
+                        <Button onClick={() => dispatch(incrementItemQuantityLocal(item.id))}>+</Button>
                       </Box>
                     </Box>  
         
@@ -78,8 +79,19 @@ const Cart = () => {
               </Box>
 
               <Box marginTop="70px">
-                  <Text>Total: $ {items.reduce((total, item) => total + item.quantity * item.precio, 0).toFixed(2)} </Text>
+                  <Text>
+                    Total: $ {
+                      Number(
+                        items.reduce((total, item) => {
+                          const price = Number(item.precio ?? item.price ?? item.precioUnit ?? 0);
+                          const qty = Number(item.quantity ?? item.cantidad ?? 0);
+                          return total + price * qty;
+                        }, 0)
+                      ).toFixed(2)
+                    }
+                  </Text>
               </Box>
+              
 
 
                 <Box display="flex" gap="20px">

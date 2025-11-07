@@ -19,7 +19,7 @@ export const Discover = () => {
                   </Button>
                 </Link>
             </Box>
-            <Box bg="#f5f5f5" p={{ base:"30px" ,lg:"60px"}} width={{base:"100%", lg:"600px"}} justifyContent="center" borderRadius="18px"  h="500px" display="flex"  allignItems="flex-start" flexDirection="column" gap="30px">
+            <Box bg="#f5f5f5" p={{ base:"30px" ,lg:"60px"}} width={{base:"100%", lg:"600px"}} justifyContent="center" borderRadius="18px"  h="500px" display="flex"  alignItems="flex-start" flexDirection="column" gap="30px">
                 <Text as = "span" fontSize="2xl" color="black">Ofertas exclusivas</Text>
                 <Heading as="h2" width={{base: "100%" , lg:"80%"}} fontSize={{base:"2xl", md:"32px" ,lg:"4xl" }} color="black">Descubre nuestra colección de muebles</Heading>
                 <Text fontSize={{ base:"16px" , lg:"xl" }} color="#2a2a2a">Tenés 10% de reintegro con nuestro cupón promocional</Text>
